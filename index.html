@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voting Vocab</title>
+  <!-- Tailwind CSS for clean, modern styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vocabulary Flashcards</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* 3D Flip Card Effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .transform-style-3d {
+            transform-style: preserve-3d;
+        }
+        .backface-hidden {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .rotate-y-180 {
+            transform: rotateY(180deg);
+        }
+
+        /* Smooth card scale animation on hover */
+        .card-container {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-container:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/25">
+                    <i class="fa-solid fa-layer-group text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">Vocab Cards</h1>
+                    <p class="text-xs text-slate-400">Practice Vocabulary</p>
+                </div>
+            </div>
+
+            <!-- Mode Switcher -->
+            <div class="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700/60 text-sm">
+                <button id="study-mode-btn" onclick="switchMode('study')" class="px-4 py-1.5 rounded-lg font-medium transition-all duration-200 bg-indigo-600 text-white shadow-sm flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-xs"></i> Study Mode
+                </button>
+                <button id="quiz-mode-btn" onclick="switchMode('quiz')" class="px-4 py-1.5 rounded-lg font-medium transition-all duration-200 text-slate-400 hover:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-xs"></i> Quiz Mode
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-8 flex-1 flex flex-col justify-center w-full">
+        
+        <!-- STUDY MODE CONTENT -->
+        <div id="study-view" class="flex flex-col items-center gap-6 w-full">
+            
+            <!-- Progress Bar & Controls Header -->
+            <div class="w-full max-w-xl flex items-center justify-between text-sm text-slate-400 px-1">
+                <div class="flex items-center gap-2">
+                    <span id="progress-text" class="font-semibold text-slate-200">1 / 5</span>
+                    <span class="text-slate-600">•</span>
+                    <span id="part-of-speech" class="capitalize italic bg-slate-800 px-2 py-0.5 rounded text-xs border border-slate-700">noun</span>
+                </div>
+                <button onclick="shuffleCards()" class="hover:text-indigo-400 transition-colors flex items-center gap-1.5 text-xs bg-slate-800/60 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700/50">
+                    <i class="fa-solid fa-shuffle"></i> Shuffle
+                </button>
+            </div>
+
+            <!-- Progress Indicator Line -->
+            <div class="w-full max-w-xl h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-indigo-500 transition-all duration-300 w-1/5"></div>
+            </div>
+
+            <!-- Interactive Flashcard container -->
+            <div class="perspective-1000 w-full max-w-xl h-96 cursor-pointer card-container" onclick="flipCard()">
+                <div id="flashcard" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-2xl border border-slate-700/80 bg-slate-800 shadow-2xl">
+                    
+                    <!-- FRONT SIDE -->
+                    <div class="absolute inset-0 w-full h-full backface-hidden rounded-2xl bg-gradient-to-b from-slate-800 to-slate-850 p-6 flex flex-col items-center justify-between text-center select-none">
+                        <div class="w-full flex justify-end items-center text-xs text-slate-500">
+                            <span>Click card to flip</span>
+                        </div>
+
+                        <!-- Card Illustration -->
+                        <div id="card-icon-container" class="my-auto py-2 text-indigo-400 flex items-center justify-center">
+                            <!-- SVG inserted via JS -->
+                        </div>
+
+                        <div>
+                            <h2 id="card-word" class="text-3xl font-extrabold tracking-wide text-white mb-1">Suffrage</h2>
+                            <p id="card-phonetic" class="text-sm font-mono text-indigo-400/80">/ˈsʌf.rɪdʒ/</p>
+                        </div>
+
+                        <div class="text-xs text-slate-500 flex items-center gap-1">
+                            <i class="fa-solid fa-rotate"></i> Flip for definition
+                        </div>
+                    </div>
+
+                    <!-- BACK SIDE -->
+                    <div class="absolute inset-0 w-full h-full backface-hidden rotate-y-180 rounded-2xl bg-slate-800 border border-indigo-500/30 p-6 flex flex-col justify-between text-center select-none">
+                        <div class="flex justify-start items-center text-xs text-indigo-400 font-semibold tracking-wider uppercase">
+                            <span>Definition</span>
+                        </div>
+
+                        <div class="my-auto px-4">
+                            <p id="card-definition" class="text-lg md:text-xl font-medium text-slate-200 leading-relaxed">
+                                The legal right to vote in political elections.
+                            </p>
+                            <div class="mt-4 pt-4 border-t border-slate-700/50">
+                                <p id="card-example" class="text-sm text-slate-400 italic">
+                                    "Many people fought for decades to achieve universal suffrage."
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="text-xs text-slate-500 flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-rotate"></i> Flip back
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Navigation Controls -->
+            <div class="flex items-center gap-4 mt-2">
+                <button onclick="prevCard()" class="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 hover:bg-slate-700 active:scale-95 text-slate-200 flex items-center justify-center transition-all shadow-lg">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <button onclick="nextCard()" class="px-8 h-12 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-semibold flex items-center gap-2 transition-all shadow-lg shadow-indigo-600/20">
+                    Next <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- QUIZ MODE CONTENT (Hidden by default) -->
+        <div id="quiz-view" class="hidden flex-col items-center gap-6 w-full max-w-xl mx-auto">
+            
+            <!-- Quiz Progress & Score -->
+            <div class="w-full flex items-center justify-between text-sm text-slate-400 px-1">
+                <span id="quiz-progress-text" class="font-semibold text-slate-200">Question 1 of 6</span>
+                <span id="quiz-score-text" class="text-indigo-400 font-medium">Score: 0</span>
+            </div>
+
+            <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                <div id="quiz-progress-bar" class="h-full bg-indigo-500 transition-all duration-300 w-1/6"></div>
+            </div>
+
+            <!-- Quiz Card Panel -->
+            <div class="w-full bg-slate-800 border border-slate-700/80 rounded-2xl p-6 shadow-2xl">
+                <div class="text-center mb-6">
+                    <span class="text-xs uppercase tracking-wider font-semibold text-indigo-400 bg-indigo-950/60 border border-indigo-800/50 px-3 py-1 rounded-full">
+                        Match Definition
+                    </span>
+                    <h3 id="quiz-prompt" class="text-lg md:text-xl font-medium text-slate-100 mt-4 leading-relaxed">
+                        What word means: "To get new knowledge or skills."?
+                    </h3>
+                </div>
+
+                <!-- Multiple Choice Options -->
+                <div id="quiz-options" class="grid grid-cols-1 gap-3">
+                    <!-- Dynamic option buttons inserted via JS -->
+                </div>
+            </div>
+
+            <!-- Quiz Control / Next Button -->
+            <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="hidden w-full py-3.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/20">
+                Continue <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+
+            <!-- Quiz Results Screen (Hidden initially) -->
+            <div id="quiz-results" class="hidden text-center w-full bg-slate-800 border border-slate-700/80 rounded-2xl p-8 shadow-2xl">
+                <div class="w-16 h-16 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mx-auto mb-4 text-2xl">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2">Quiz Completed!</h3>
+                <p id="quiz-final-score" class="text-slate-300 text-lg mb-6">You scored 6 out of 6</p>
+                <button onclick="restartQuiz()" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-medium transition-all">
+                    Try Again
+                </button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        <p>Interactive Vocabulary Flashcard Application</p>
+    </footer>
+
+    <script>
+        // Updated vocabulary dataset with varied everyday example sentences
+        const flashcardsData = [
+            {
+                word: "Suffrage",
+                phonetic: "/ˈsʌf.rɪdʒ/",
+                partOfSpeech: "noun",
+                definition: "The legal right to vote in political elections.",
+                example: "Many brave activists marched for decades to win women's suffrage.",
+                svg: `<svg class="w-24 h-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><path d="M5 7c0-1.1.9-2 2-2h10a2 2 0 0 1 2 2v12H5V7Z"/><path d="M22 19H2"/></svg>`
+            },
+            {
+                word: "citizen",
+                phonetic: "/ˈsɪt.ɪ.zən/",
+                partOfSpeech: "noun",
+                definition: "A legal member of a country with rights under its laws.",
+                example: "After living in the country for five years, Maria applied to become a citizen and get her passport.",
+                svg: `<svg class="w-24 h-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="14" x="3" y="5" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2"/><line x1="15" x2="18" y1="10" y2="10"/><line x1="15" x2="18" y1="14" y2="14"/></svg>`
+            },
+            {
+                word: "amendment",
+                phonetic: "/əˈmend.mənt/",
+                partOfSpeech: "noun",
+                definition: "An official change or addition to a law or constitution.",
+                example: "The club members proposed an amendment to their bylaws to allow weekend meetings.",
+                svg: `<svg class="w-24 h-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M12 18v-6"/><path d="M9 15h6"/></svg>`
+            },
+            {
+                word: "deny",
+                phonetic: "/dɪˈnaɪ/",
+                partOfSpeech: "verb",
+                definition: "To refuse to give or grant something to someone.",
+                example: "The security guard had to deny entry to anyone who forgot their event ticket.",
+                svg: `<svg class="w-24 h-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>`
+            },
+            {
+                word: "protect",
+                phonetic: "/prəˈtekt/",
+                partOfSpeech: "verb",
+                definition: "To keep someone or something safe from harm or unfair treatment.",
+                example: "Wearing a helmet and knee pads will help protect you if you fall off your skateboard.",
+                svg: `<svg class="w-24 h-24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`
+            }
+        ];
+
+        // App state variables
+        let cards = [...flashcardsData];
+        let currentIndex = 0;
+        let isFlipped = false;
+        let currentMode = 'study'; // 'study' or 'quiz'
+
+        // Quiz state variables
+        let quizIndex = 0;
+        let quizScore = 0;
+        let quizQuestions = [];
+        let optionSelected = false;
+
+        // Initialize application state
+        window.onload = function() {
+            renderCard();
+        };
+
+        // Render current flashcard content
+        function renderCard() {
+            const card = cards[currentIndex];
+            
+            // Reset flip state smoothly without glitching
+            const cardEl = document.getElementById('flashcard');
+            if (isFlipped) {
+                cardEl.classList.remove('rotate-y-180');
+                isFlipped = false;
+            }
+
+            // Populate Front
+            document.getElementById('card-word').textContent = card.word;
+            document.getElementById('card-phonetic').textContent = card.phonetic;
+            document.getElementById('card-icon-container').innerHTML = card.svg;
+            document.getElementById('part-of-speech').textContent = card.partOfSpeech;
+
+            // Populate Back
+            document.getElementById('card-definition').textContent = card.definition;
+            document.getElementById('card-example').textContent = `"${card.example}"`;
+
+            // Update Progress Line & Counter
+            const total = cards.length;
+            document.getElementById('progress-text').textContent = `${currentIndex + 1} / ${total}`;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / total) * 100}%`;
+        }
+
+        // Card flip animation handler
+        function flipCard() {
+            const cardEl = document.getElementById('flashcard');
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                cardEl.classList.add('rotate-y-180');
+            } else {
+                cardEl.classList.remove('rotate-y-180');
+            }
+        }
+
+        // Navigation functions
+        function nextCard() {
+            currentIndex = (currentIndex + 1) % cards.length;
+            renderCard();
+        }
+
+        function prevCard() {
+            currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+            renderCard();
+        }
+
+        // Shuffle Cards
+        function shuffleCards() {
+            for (let i = cards.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [cards[i], cards[j]] = [cards[j], cards[i]];
+            }
+            currentIndex = 0;
+            renderCard();
+        }
+
+        // Mode Switcher Logic
+        function switchMode(mode) {
+            currentMode = mode;
+            const studyBtn = document.getElementById('study-mode-btn');
+            const quizBtn = document.getElementById('quiz-mode-btn');
+            const studyView = document.getElementById('study-view');
+            const quizView = document.getElementById('quiz-view');
+
+            if (mode === 'study') {
+                studyBtn.className = "px-4 py-1.5 rounded-lg font-medium transition-all duration-200 bg-indigo-600 text-white shadow-sm flex items-center gap-2";
+                quizBtn.className = "px-4 py-1.5 rounded-lg font-medium transition-all duration-200 text-slate-400 hover:text-white flex items-center gap-2";
+                studyView.classList.remove('hidden');
+                studyView.classList.add('flex');
+                quizView.classList.add('hidden');
+                quizView.classList.remove('flex');
+            } else {
+                quizBtn.className = "px-4 py-1.5 rounded-lg font-medium transition-all duration-200 bg-indigo-600 text-white shadow-sm flex items-center gap-2";
+                studyBtn.className = "px-4 py-1.5 rounded-lg font-medium transition-all duration-200 text-slate-400 hover:text-white flex items-center gap-2";
+                studyView.classList.add('hidden');
+                studyView.classList.remove('flex');
+                quizView.classList.remove('hidden');
+                quizView.classList.add('flex');
+                startQuiz();
+            }
+        }
+
+        // Start Quiz Mode
+        function startQuiz() {
+            quizIndex = 0;
+            quizScore = 0;
+            optionSelected = false;
+            
+            // Prepare shuffled quiz questions
+            quizQuestions = [...flashcardsData].sort(() => Math.random() - 0.5);
+            
+            document.getElementById('quiz-results').classList.add('hidden');
+            document.querySelector('#quiz-view > .bg-slate-800').classList.remove('hidden');
+            renderQuizQuestion();
+        }
+
+        // Render current Quiz Question
+        function renderQuizQuestion() {
+            optionSelected = false;
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+
+            const currentQ = quizQuestions[quizIndex];
+            const total = quizQuestions.length;
+
+            document.getElementById('quiz-progress-text').textContent = `Question ${quizIndex + 1} of ${total}`;
+            document.getElementById('quiz-score-text').textContent = `Score: ${quizScore}`;
+            document.getElementById('quiz-progress-bar').style.width = `${((quizIndex + 1) / total) * 100}%`;
+            
+            document.getElementById('quiz-prompt').textContent = `What word means: "${currentQ.definition}"`;
+
+            // Generate options (1 correct answer + 3 distractors)
+            let choices = [currentQ.word];
+            let distractors = flashcardsData.map(item => item.word).filter(w => w !== currentQ.word);
+            distractors.sort(() => Math.random() - 0.5);
+            
+            choices = choices.concat(distractors.slice(0, 3)).sort(() => Math.random() - 0.5);
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = '';
+
+            choices.forEach(option => {
+                const button = document.createElement('button');
+                button.className = "w-full py-3 px-4 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 text-left font-medium transition-all flex items-center justify-between";
+                button.innerHTML = `<span>${option}</span> <i class="fa-regular fa-circle text-slate-500"></i>`;
+                button.onclick = () => selectQuizOption(button, option, currentQ.word);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // Handle Quiz Option Selection
+        function selectQuizOption(selectedBtn, selectedOption, correctAnswer) {
+            if (optionSelected) return; // Prevent multiple selections
+            optionSelected = true;
+
+            const optionsContainer = document.getElementById('quiz-options');
+            const buttons = optionsContainer.querySelectorAll('button');
+
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-slate-700/80');
+                const wordText = btn.querySelector('span').textContent;
+
+                if (wordText === correctAnswer) {
+                    btn.classList.add('bg-emerald-900/40', 'border-emerald-500', 'text-emerald-200');
+                    btn.querySelector('i').className = "fa-solid fa-circle-check text-emerald-400";
+                } else if (btn === selectedBtn) {
+                    btn.classList.add('bg-rose-900/40', 'border-rose-500', 'text-rose-200');
+                    btn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-400";
+                }
+            });
+
+            if (selectedOption === correctAnswer) {
+                quizScore++;
+                document.getElementById('quiz-score-text').textContent = `Score: ${quizScore}`;
+            }
+
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+        }
+
+        // Advance to next quiz question or show results
+        function nextQuizQuestion() {
+            quizIndex++;
+            if (quizIndex < quizQuestions.length) {
+                renderQuizQuestion();
+            } else {
+                showQuizResults();
+            }
+        }
+
+        // Show Final Quiz Results
+        function showQuizResults() {
+            document.querySelector('#quiz-view > .bg-slate-800').classList.add('hidden');
+            document.getElementById('quiz-next-btn').classList.add('hidden');
+            
+            const resultsEl = document.getElementById('quiz-results');
+            resultsEl.classList.remove('hidden');
+            
+            document.getElementById('quiz-final-score').textContent = `You scored ${quizScore} out of ${quizQuestions.length}`;
+        }
+
+        function restartQuiz() {
+            startQuiz();
+        }
+
+        // Keyboard navigation support
+        document.addEventListener('keydown', (e) => {
+            if (currentMode === 'study') {
+                if (e.key === 'ArrowRight') nextCard();
+                if (e.key === 'ArrowLeft') prevCard();
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    flipCard();
+                }
+            }
+        });
+    </script>
+</body>
+</html>
